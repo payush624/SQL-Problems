@@ -1,0 +1,19 @@
+Y-on-Y Growth Rate (https://datalemur.com/questions/yoy-growth-rate)
+
+WITH curr_spend as (
+SELECT 
+    date_part('year',transaction_date) as "year",
+    product_id,
+    sum(spend) curr_year_spend
+FROM user_transactions
+GROUP by date_part('year',transaction_date),
+         product_id
+ORDER BY product_id,
+         date_part('year',transaction_date)
+)
+SELECT 
+    *,
+    lag(curr_year_spend) over(partition by product_id) as prev_year_spend,
+    ROUND((curr_year_spend - (lag(curr_year_spend) over(partition by product_id))) / lag(curr_year_spend) over(partition by product_id) * 100,2) as yoy_rate
+FROM curr_spend
+

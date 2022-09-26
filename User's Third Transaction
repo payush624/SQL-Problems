@@ -10,10 +10,10 @@ FROM (
           user_id,
           spend,
           transaction_date,
-          ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY transaction_date asc) as rn
+          ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY transaction_date asc) as trans_rnk
       FROM transactions
       ) a
       
-WHERE rn = 3
+WHERE trans_rnk = 3
 
 

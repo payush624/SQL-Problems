@@ -1,0 +1,31 @@
+### https://datalemur.com/questions/compensation-outliers
+
+WITH title_pay as (
+SELECT 
+    title,
+    ROUND(AVG(salary)) as Average_Sal
+FROM employee_pay
+GROUP BY title
+),
+sal as (
+SELECT 
+    a.employee_id,
+    a.salary,
+    b.Average_Sal as avg_sal
+FROM employee_pay a
+JOIN title_pay b ON
+     a.title = b.title
+),
+payout_status as (
+SELECT 
+    employee_id,
+    salary,
+    CASE WHEN salary > avg_sal * 2 THEN 'Overpaid'
+         WHEN salary < avg_sal / 2 THEN 'Underpaid'
+    END as outlier_status
+FROM sal
+)
+select 
+    * 
+FROM payout_status
+WHERE payout_status is not null

@@ -1,0 +1,21 @@
+### https://datalemur.com/questions/duplicate-job-listings
+
+-- Find duplicate Job positing, We can say that when we see a job positing again its considered as duplicate Job posting
+-- count(job_id) and then group by company_id, title, description (cuz all dup job positing will have same company_id, title, description)
+-- Convert previous query to CTE and then write a query to filter out posting_counts =1 and then apply distinct count on positng_counts to get unique companies count
+
+WITH duplicate_posting as (
+SELECT 
+    COUNT(job_id) as posting_counts,
+    company_id,
+    title,
+    description
+FROM job_listings
+GROUP BY company_id,
+         title,
+         description
+)
+SELECT 
+    COUNT(DISTINCT posting_counts) as duplicate_companies
+FROM duplicate_posting
+WHERE posting_counts > 1

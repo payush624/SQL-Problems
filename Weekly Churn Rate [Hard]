@@ -1,0 +1,21 @@
+### https://datalemur.com/questions/first-month-retention
+
+
+WITH churn_rate AS (
+SELECT 
+    (EXTRACT(WEEK FROM signup_date) - 
+    EXTRACT(WEEK FROM DATE_TRUNC('Month',signup_date))) + 1 AS signup_week,
+    CASE WHEN (last_login::DATE - signup_date::DATE) <= 28 THEN 1
+    ELSE NULL END AS churned_user,
+    COUNT(user_id) OVER(PARTITION BY EXTRACT(WEEK FROM signup_date)) AS user_count
+FROM users
+
+WHERE EXTRACT(MONTH FROM signup_date) = 6
+  AND EXTRACT(YEAR FROM signup_date) = 2022
+  )
+  
+SELECT 
+   signup_week,
+   ROUND((count(churned_user)*1.0 / count(user_count)*1.0)*100,2)
+FROM churn_rate
+GROUP BY signup_week

@@ -1,0 +1,25 @@
+### https://datalemur.com/questions/sql-bad-experience
+
+
+WITH experience AS (
+SELECT 
+    a.order_id,
+    b.trip_id,
+    a.status,
+    c.customer_id,
+    c.signup_timestamp,
+    a.order_timestamp,
+    b.actual_delivery_timestamp
+FROM orders a
+INNER JOIN trips b ON 
+    a.trip_id = b.trip_id
+INNER JOIN customers c ON
+    a.customer_id = c.customer_id
+WHERE EXTRACT(MONTH FROM c.signup_timestamp) = 6 
+      AND a.order_timestamp::DATE - c.signup_timestamp::DATE <= 14 
+)
+SELECT 
+    ROUND((SELECT COUNT(status) FROM experience 
+    WHERE status in ('completed incorrectly', 'never received'))*1.0 /
+    COUNT(*)*100,2) AS bad_experience_pct
+FROM experience

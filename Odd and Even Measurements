@@ -1,0 +1,21 @@
+### https://datalemur.com/questions/odd-even-measurements
+
+
+WITH measurements_ranked AS (
+SELECT 
+    measurement_id,
+    measurement_value,
+    measurement_time,
+    ROW_NUMBER() OVER(PARTITION BY DATE_PART('day',measurement_time) ORDER BY measurement_time asc) AS measure_type
+FROM measurements
+)
+SELECT 
+  DATE(measurement_time) AS measurement_day,
+  SUM(CASE WHEN measure_type % 2 != 0 
+           THEN measurement_value
+           END) AS odd_sum,
+  SUM(CASE WHEN measure_type % 2 = 0 
+           THEN measurement_value
+           END) AS even_sum
+FROM measurements_ranked
+GROUP BY DATE(measurement_time)

@@ -1,0 +1,18 @@
+### https://datalemur.com/questions/repeated-payments
+
+-- EPOCH calculates the total number of seconds in a given interval.
+
+WITH CTE AS (
+SELECT 
+    merchant_id,
+    credit_card_id,
+    amount,
+    transaction_timestamp,
+    LEAD(transaction_timestamp,1) OVER(PARTITION BY merchant_id, credit_card_id, amount ORDER BY transaction_timestamp),
+    ROUND(extract(epoch from LEAD(transaction_timestamp,1) OVER(PARTITION BY merchant_id, credit_card_id, amount ORDER BY transaction_timestamp) - transaction_timestamp) / 60,2) as Difference_in_minute
+FROM transactions
+)
+SELECT 
+    COUNT(Difference_in_minute) as payment_count
+FROM CTE
+WHERE Difference_in_minute <= 10

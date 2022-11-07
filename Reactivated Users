@@ -1,0 +1,15 @@
+### https://datalemur.com/questions/reactivated-users
+
+SELECT 
+    EXTRACT(MONTH FROM login_date) as current_month,
+    COUNT(user_id) reactivated_users
+FROM user_logins as current_login
+WHERE NOT EXISTS (
+                      SELECT 
+                          *
+                      FROM user_logins as past_login
+                      WHERE current_login.user_id = past_login.user_id AND
+                            EXTRACT(MONTH FROM past_login.login_date) =
+                            EXTRACT(MONTH FROM current_login.login_date - '1 month' :: interval) )
+GROUP BY EXTRACT(MONTH FROM login_date)
+ORDER BY EXTRACT(MONTH FROM login_date) ASC

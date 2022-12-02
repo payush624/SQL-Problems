@@ -1,0 +1,24 @@
+# https://platform.stratascratch.com/coding/10173-days-at-number-one?code_type=1
+
+-- first position in us and world (inner join)
+-- Order by trackname 
+
+WITH track as (
+SELECT 
+    us.trackname,
+    SUM(
+        CASE WHEN world.position = 1 THEN 1
+             ELSE 0
+             END) OVER(PARTITION BY us.trackname) as no_of_days_on_1
+FROM spotify_daily_rankings_2017_us us 
+INNER JOIN spotify_worldwide_daily_song_ranking world ON 
+    us.trackname = world.trackname AND
+    us.date = world.date
+WHERE us.position = 1
+)
+SELECT 
+    trackname,
+    MAX(no_of_days_on_1) as no_of_days_on_1st_posi
+FROM track
+GROUP BY trackname
+ORDER BY trackname

@@ -1,0 +1,13 @@
+
+## https://datalemur.com/questions/pizzas-topping-cost
+
+
+SELECT
+CONCAT(a.topping_name,',',b.topping_name,',',c.topping_name) as pizza,
+(a.ingredient_cost + b.ingredient_cost + c.ingredient_cost) as total_cost
+FROM pizza_toppings a
+inner join pizza_toppings b ON
+a.topping_name < b.topping_name
+INNER JOIN pizza_toppings c ON
+b.topping_name < c.topping_name
+ORDER BY total_cost DESC, pizza

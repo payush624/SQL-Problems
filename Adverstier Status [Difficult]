@@ -1,0 +1,16 @@
+## https://datalemur.com/questions/updated-status
+
+
+SELECT 
+  COALESCE(a.user_id,b.user_id) as user_id,
+  CASE WHEN a.status in ('NEW','EXISTING','CHURN','RESURRECT') and b.paid is NULL THEN 'CHURN'
+       WHEN a.status in ('NEW','EXISTING','RESURRECT') and b.paid IS NOT NULL THEN 'EXISTING'
+       WHEN a.status in ('CHURN') AND b.paid IS NOT NULL THEN 'RESURRECT'
+       WHEN a.status IS NULL AND b.paid IS NOT NULL THEN 'NEW'
+  END AS new_status
+FROM advertiser a  
+
+FULL OUTER JOIN daily_pay b ON
+   a.user_id = b.user_id
+
+ORDER BY COALESCE(a.user_id,b.user_id) 

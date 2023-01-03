@@ -1,0 +1,28 @@
+## https://datalemur.com/questions/top-fans-rank
+
+
+-- top 5 artist in top 10 of global_song_rank highest no of time as song apperance
+-- 
+
+WITH top_5_artist AS (
+SELECT 
+    a.artist_name,
+    COUNT(c.rank) as apperance,
+    DENSE_RANK() OVER(ORDER BY COUNT(c.rank) DESC) as artist_rank
+
+FROM artists a
+
+LEFT JOIN songs b ON
+  a.artist_id = b.artist_id
+LEFT JOIN global_song_rank c ON
+  b.song_id  = c.song_id
+  
+WHERE c.rank <= 10
+
+GROUP BY a.artist_name
+)
+SELECT 
+  artist_name,
+  artist_rank
+FROM top_5_artist
+WHERE artist_rank <=5

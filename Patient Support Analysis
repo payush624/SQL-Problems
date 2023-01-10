@@ -1,0 +1,22 @@
+https://datalemur.com/questions/long-calls-growth
+
+
+WITH calls AS (
+SELECT 
+    EXTRACT(YEAR FROM call_received) yr,
+    EXTRACT(MONTH FROM call_received) mth,
+    COUNT(policy_holder_id) no_of_calls
+FROM callers
+
+WHERE call_duration_secs > 300
+
+GROUP BY EXTRACT(YEAR FROM call_received),
+    EXTRACT(MONTH FROM call_received)
+    
+ORDER BY EXTRACT(MONTH FROM call_received)
+)
+SELECT 
+  yr,
+  mth,
+  ROUND(((no_of_calls - lag(no_of_calls) OVER(ORDER BY mth)*1.0) / lag(no_of_calls) OVER(ORDER BY mth))*100,1) AS growth_pct 
+FROM calls

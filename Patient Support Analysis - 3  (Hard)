@@ -1,0 +1,13 @@
+# https://datalemur.com/questions/patient-call-history
+
+WITH calls AS (
+SELECT 
+    policy_holder_id,
+    call_received,
+    DATE_PART('day',lead(call_received) OVER(PARTITION BY policy_holder_id ORDER BY call_received)::timestamp - call_received::timestamp) as within_days
+FROM callers
+ORDER BY policy_holder_id)
+SELECT
+    COUNT(DISTINCT policy_holder_id) as patient_count
+FROM calls
+WHERE within_days < 7 
